@@ -10,7 +10,7 @@ const { findUserByEmail,
     revokeRefreshToken,
     findUserById } = require('../repositories/userRepository')
 
-const { Conflict, UnauthorizedError } = require('../utils/AppError')
+const { ConflictError, UnauthorizedError } = require('../utils/AppError')
 
 const { hashPassword, comparePassword, findMatchingToken } = require('../utils/hashing')
 
@@ -22,7 +22,7 @@ const { signAccessToken, signRefreshToken } = require('../utils/jwt')
 const createNewUser = async ({ email, password, name }) => {
     const user = await findUserByEmail(email)
     if (user) {
-        throw new Conflict('User already exists')
+        throw new ConflictError('User already exists')
     }
     const hashedPassword = await hashPassword(password)
 
