@@ -12,7 +12,17 @@ async function comparePassword(password, hashedPassword) {
     return isMatch;
 }
 
+async function findMatchingToken(rawToken, hashes) {
+    for (const hash of hashes) {
+        if (await comparePassword(rawToken, hash)) {
+            return hash;
+        }
+    }
+    return null;
+}
+
 module.exports = {
     hashPassword,
     comparePassword,
+    findMatchingToken
 };

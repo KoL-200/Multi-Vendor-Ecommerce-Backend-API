@@ -1,3 +1,4 @@
+const { id } = require('zod/v4/locales')
 const { prisma } = require('../config/database')
 
 function findUserByEmail(email) {
@@ -27,8 +28,51 @@ function createRefreshToken({ userId, tokenHash, userAgent, expiresAt }) {
     })
 }
 
+function findRefreshTokensByUserId(userId) {
+    return prisma.refreshToken.findMany({ where: { userId, revokedAt: null } });
+}
+
+function findRevokedRefreshTokensByUserId(userId) {
+    return prisma.refreshToken.findMany({ where: { userId, revokedAt: { not: null } } });
+}
+
+function revokeAllUserRefreshTokens(userId) {
+    return prisma.refreshToken.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: new Date() }
+    })
+}
+
+function revokeRefreshToken(tokenId) {
+    return prisma.refreshToken.update({
+        where: { id: tokenId },
+        data: { revokedAt: new Date() }
+    })
+}
+
+function findUserById(userId) {
+    return prisma.user.findUnique({
+        where: { id: userId }
+    })
+}
+
+function updateUser(userId, data) {
+    return prisma.user.update(
+        {
+            where: { id: userId },
+            data
+        }
+    )
+}
+
 module.exports = {
     findUserByEmail,
     createUser,
-    createRefreshToken
+    createRefreshToken,
+    findRefreshTokensByUserId,
+    findRevokedRefreshTokensByUserId,
+    revokeAllUserRefreshTokens,
+    revokeRefreshToken,
+    findUserById,
+    updateUser
 }
