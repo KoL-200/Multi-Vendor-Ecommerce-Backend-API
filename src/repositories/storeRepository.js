@@ -24,8 +24,32 @@ function findStoreById(storeId) {
     });
 }
 
+function findAllActiveStores() {
+    return prisma.store.findMany({ where: { isActive: true } });
+}
+
+function updateStoreById(id, data) {
+    return prisma.store.update(
+        {
+            where: { id },
+            data
+        }
+    )
+}
+
+function deleteStoreByid(id) {
+    return prisma.store.delete(
+        {
+            where: { id }
+        }
+    )
+}
+
 module.exports = {
     createStore,
     findStoreByOwnerId,
-    findStoreById
+    findStoreById,
+    findAllActiveStores,
+    updateStoreById,
+    deleteStoreByid
 };
