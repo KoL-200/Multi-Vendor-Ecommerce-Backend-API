@@ -1,13 +1,13 @@
 const { z } = require('zod')
 
-const addToCartSchema = zod.object(
+const addToCartSchema = z.object(
     {
         "productId": z.uuid(),
         "quantity": z.int().min(1, "Quantity required")
     }
 )
 
-const updateCartItemSchema = zod.object(
+const updateCartItemSchema = z.object(
     {
         "quantity": z.int().min(1, "Quantity required")
 

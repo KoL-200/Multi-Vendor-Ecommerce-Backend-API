@@ -2,6 +2,7 @@ const { findCategoryById } = require('../repositories/categoryRepository')
 
 const { createProduct, findProductById, findProductByStoreId, updateProduct, deleteProduct, findProducts, countProducts } = require('../repositories/productRepository')
 const { findStoreByOwnerId, findStoreById } = require('../repositories/storeRepository')
+const { findReviewsByProductId } = require('../repositories/reviewRepository')
 
 const { dollarsToCents } = require('../utils/money')
 
@@ -38,11 +39,24 @@ const createNewProduct = async (userId, data) => {
 };
 
 const getProductById = async (id) => {
-    const product = await findProductById(id);
+    const product = await findProductById(id)
+
     if (!product || !product.isActive) {
         throw new NotFoundError('Product not found');
     }
-    return product;
+
+    const reviews = await findReviewsByProductId(id)
+
+    const reviewCount = reviews.length
+    const averageRating = reviewCount > 0
+        ? Number((reviews.reduce((sum, rev) => sum + rev.rating, 0) / reviewCount).toFixed(2))
+        : 0
+
+    return {
+        ...product,
+        averageRating,
+        reviewCount
+    };
 };
 
 const getMyProducts = async (userId) => {

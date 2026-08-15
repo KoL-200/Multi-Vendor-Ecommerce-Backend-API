@@ -9,7 +9,7 @@ const { addToCartSchema, updateCartItemSchema } = require('../validators/cartVal
 const { getItenFromCart, addToCart, updateItemFromCart, deleteItemFromCart } = require('../controllers/cartController');
 
 routes.get('/', authenticate, getItenFromCart)
-routes.post('/items', authenticate, validate(addToCartSchema), addItemToCart)
+routes.post('/items', authenticate, validate(addToCartSchema), addToCart)
 routes.patch('/items/:id', authenticate, validate(updateCartItemSchema), updateItemFromCart)
 routes.delete('/items/:id', authenticate, deleteItemFromCart)
 

@@ -29,7 +29,7 @@ const deleteItemFromCart = async (req, res, next) => {
 
 module.exports = {
     getItenFromCart,
-    addItemToCart,
+    addToCart,
     updateItemFromCart,
     deleteItemFromCart
 }
