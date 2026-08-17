@@ -76,6 +76,23 @@ function deleteProduct(id) {
     )
 }
 
+function findProductsByIds(ids) {
+    return prisma.product.findMany(
+        {
+            where: {
+                id: {
+                    in: ids
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                price: true
+            }
+        }
+    )
+}
+
 module.exports = {
     createProduct,
     findProductById,
@@ -83,5 +100,6 @@ module.exports = {
     findProducts,
     countProducts,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    findProductsByIds
 }
