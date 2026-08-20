@@ -9,10 +9,10 @@ const { listPendingApplications, approve, reject, suspend } = require('../contro
 routes.get('/stats/overview', authenticate, requireAdmin, overviewStats);
 routes.get('/stats/revenue', authenticate, requireAdmin, revenueStats)
 routes.get('/stats/best-sellers', authenticate, requireAdmin, bestProducts)
-routes.get('/vendor-application', authenticate, requireAdmin, listPendingApplications)
+routes.get('/vendor-applications', authenticate, requireAdmin, listPendingApplications)
 
 routes.patch('/vendor-applications/:userId/approve', authenticate, requireAdmin, approve)
 routes.patch('/vendor-applications/:userId/reject', authenticate, requireAdmin, reject)
-routes.patch('/vendor-applications/:userId/suspend', authenticate, suspend)
+routes.patch('/vendor-applications/:userId/suspend', authenticate, requireAdmin, suspend)
 
 module.exports = routes;

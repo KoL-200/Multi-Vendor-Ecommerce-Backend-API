@@ -8,7 +8,7 @@ const apply = async (req, res) => {
         {
             success: true,
             message: 'Vendor application submitted successfully',
-            data: { vendorStatus: updateUser.status }
+            data: { vendorStatus: updateUser.vendorStatus }
         }
     )
 }

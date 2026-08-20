@@ -17,7 +17,7 @@ const applyForVendor = async (userId) => {
         throw new BadRequestError('You are already an approved vendor')
     }
 
-    return await updateUser(userId, { vendorStatus: 'APPROVED' })
+    return await updateUser(userId, { vendorStatus: 'PENDING' })
 }
 
 const getPendingApplications = async () => {
@@ -63,7 +63,7 @@ const suspendVendor = async (userId) => {
         throw new BadRequestError('Only currently APPROVED vendors can be suspended')
     }
 
-    return updateUser(userId, { vendorStatus: 'REJECTED' })
+    return updateUser(userId, { vendorStatus: 'SUSPENDED' })
 }
 
 module.exports = {
