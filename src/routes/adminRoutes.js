@@ -13,6 +13,6 @@ routes.get('/vendor-applications', authenticate, requireAdmin, listPendingApplic
 
 routes.patch('/vendor-applications/:userId/approve', authenticate, requireAdmin, approve)
 routes.patch('/vendor-applications/:userId/reject', authenticate, requireAdmin, reject)
-routes.patch('/vendor-applications/:userId/suspend', authenticate, requireAdmin, suspend)
+routes.patc('/vendor-applications/:userId/suspend', authenticate, requireAdmin, suspend)
 
 module.exports = routes;
