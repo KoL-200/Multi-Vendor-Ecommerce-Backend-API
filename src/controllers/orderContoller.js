@@ -1,4 +1,3 @@
-const { success } = require('zod/mini')
 const { checkoutCart, getMyOrders, getOrderById, cancelOrder } = require('../services/orderService')
 
 const checkout = async (req, res, next) => {

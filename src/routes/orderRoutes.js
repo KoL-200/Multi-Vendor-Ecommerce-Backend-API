@@ -11,6 +11,6 @@ const { checkOutSchema } = require('../validators/orderValidator');
 routes.post('/', authenticate, validate(checkOutSchema), checkout)
 routes.get('/', authenticate, myOrders)
 routes.get('/:id', authenticate, myOrder)
-routes.patch('/:id', authenticate, updatedOrderStatus)
+routes.patch('/:id/cancel', authenticate, updatedOrderStatus)
 
 module.exports = routes
