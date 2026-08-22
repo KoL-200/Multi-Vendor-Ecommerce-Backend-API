@@ -132,3 +132,18 @@ describe('POST /api/v1/auth/login', () => {
         expect(response.body.error).toMatch(/invalid credentials/i)
     })
 })
+
+describe('POST /api/v1/auth/refresh', () => {
+    let initialRefreshToken
+
+    beforeEach(async () => {
+        await cleanDatabase()
+
+        await request(app).post('/api/v1/auth/register')
+            .send({
+                email: 'carlos@gmail.com',
+                name: 'Carlos',
+                password: 'carlos123'
+            })
+    })
+})
