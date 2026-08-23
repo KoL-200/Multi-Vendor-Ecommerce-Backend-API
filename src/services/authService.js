@@ -84,6 +84,10 @@ const refreshTokens = async (rawRefreshToken) => {
         throw new UnauthorizedError('Invalid refresh token');
     }
 
+    console.log('DEBUG: revoking token id', matchedToken.id);
+    await revokeRefreshToken(matchedToken.id);
+    console.log('DEBUG: revoke call completed');
+
     await revokeRefreshToken(matchedToken.id);
 
     const user = await findUserById(payload.userId);

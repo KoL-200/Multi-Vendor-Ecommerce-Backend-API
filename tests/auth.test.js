@@ -145,5 +145,57 @@ describe('POST /api/v1/auth/refresh', () => {
                 name: 'Carlos',
                 password: 'carlos123'
             })
+
+        const loginResponse = await request(app).post('/api/v1/auth/login')
+            .send({
+                email: 'carlos@gmail.com',
+                password: 'carlos123'
+            })
+
+        console.log('LOGIN RESPONSE:', JSON.stringify(loginResponse.body));
+
+        initialRefreshToken = loginResponse.body.data.refreshToken
+    })
+
+    afterAll(async () => {
+        await disconnectDatabase()
+    })
+
+    it('issues new tokens for a valid refresh token', async () => {
+        const response = await request(app)
+            .post('/api/v1/auth/refresh')
+            .send({ refreshToken: initialRefreshToken })
+            .expect(200)
+
+        expect(response.body).toHaveProperty('success', true)
+        expect(response.body.data).toHaveProperty('accessToken')
+        expect(response.body.data).toHaveProperty('refreshToken')
+        expect(response.body.data.refreshToken).not.toBe(initialRefreshToken)
+    })
+
+    it('rejects the reuse of an already rotated refresh token', async () => {
+        const firstRefreshResponse = await request(app)
+            .post('/api/v1/auth/refresh')
+            .send({ refreshToken: initialRefreshToken })
+            .expect(200)
+
+        const rotatedRefreshToken = firstRefreshResponse.body.data.refreshToken
+
+        const secondRefreshResponse = await request(app)
+            .post('/api/v1/auth/refresh')
+            .send({ refreshToken: initialRefreshToken })
+            .expect(401)
+
+        expect(secondRefreshResponse.body).toHaveProperty('error')
+        expect(secondRefreshResponse.body.error).toMatch(/invalid|revoked|expired/i)
+    })
+
+    it('rejects a invalid refresh token', async () => {
+        const response = await request(app)
+            .post('/api/v1/auth/refresh')
+            .send({ refreshToken: 'invalid.jwt.token' })
+            .expect(401)
+
+        expect(response.body).toHaveProperty('error')
     })
 })
