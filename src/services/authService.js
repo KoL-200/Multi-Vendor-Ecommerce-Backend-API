@@ -12,7 +12,7 @@ const { findUserByEmail,
 
 const { ConflictError, UnauthorizedError } = require('../utils/AppError')
 
-const { hashPassword, comparePassword, findMatchingToken } = require('../utils/hashing')
+const { hashPassword, comparePassword, hashToken, findMatchingToken } = require('../utils/hashing')
 
 const ms = require('ms')
 
@@ -45,7 +45,7 @@ const loginUser = async ({ email, password, userAgent }) => {
     const accessToken = signAccessToken(user)
     const refreshToken = signRefreshToken(user)
 
-    const refreshTokenHash = await hashPassword(refreshToken)
+    const refreshTokenHash = hashToken(refreshToken)
 
     const expiresAt = new Date(Date.now() + ms(env.JWT_REFRESH_EXPIRATION))
 
@@ -70,30 +70,25 @@ const refreshTokens = async (rawRefreshToken) => {
 
     const activeCandidates = await findRefreshTokensByUserId(payload.userId);
 
-    const matchedHash = await findMatchingToken(rawRefreshToken, activeCandidates.map((c) => c.tokenHash));
+    const matchedHash = findMatchingToken(rawRefreshToken, activeCandidates.map((c) => c.tokenHash));
 
     const matchedToken = activeCandidates.find((c) => c.tokenHash === matchedHash);
 
     if (!matchedToken) {
-
         const revokedCandidates = await findRevokedRefreshTokensByUserId(payload.userId);
-        const reusedHash = await findMatchingToken(rawRefreshToken, revokedCandidates.map((c) => c.tokenHash));
+        const reusedHash = findMatchingToken(rawRefreshToken, revokedCandidates.map((c) => c.tokenHash));
         if (reusedHash) {
             await revokeAllUserRefreshTokens(payload.userId);
         }
         throw new UnauthorizedError('Invalid refresh token');
     }
 
-    console.log('DEBUG: revoking token id', matchedToken.id);
-    await revokeRefreshToken(matchedToken.id);
-    console.log('DEBUG: revoke call completed');
-
     await revokeRefreshToken(matchedToken.id);
 
     const user = await findUserById(payload.userId);
     const newAccessToken = signAccessToken(user);
     const newRefreshToken = signRefreshToken(user);
-    const newHash = await hashPassword(newRefreshToken);
+    const newHash = hashToken(newRefreshToken);
     const expiresAt = new Date(Date.now() + ms(env.JWT_REFRESH_EXPIRATION));
 
     await createRefreshToken({
@@ -117,7 +112,10 @@ const logoutUser = async (rawRefreshToken) => {
     }
 
     const activeCandidates = await findRefreshTokensByUserId(payload.userId);
+    console.log('DEBUG: active candidate hashes:', activeCandidates.map(c => c.tokenHash));
     const matchedHash = await findMatchingToken(rawRefreshToken, activeCandidates.map((c) => c.tokenHash));
+    console.log('DEBUG: rawRefreshToken being checked:', rawRefreshToken);
+    console.log('DEBUG: matchedHash result:', matchedHash);
     const matchedToken = activeCandidates.find((c) => c.tokenHash === matchedHash);
 
     if (matchedToken) {

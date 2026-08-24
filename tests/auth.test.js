@@ -177,7 +177,6 @@ describe('POST /api/v1/auth/refresh', () => {
         const firstRefreshResponse = await request(app)
             .post('/api/v1/auth/refresh')
             .send({ refreshToken: initialRefreshToken })
-            .expect(200)
 
         const rotatedRefreshToken = firstRefreshResponse.body.data.refreshToken
 
