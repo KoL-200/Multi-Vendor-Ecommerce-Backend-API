@@ -3,6 +3,7 @@ const request = require('supertest')
 const app = require('../src/app')
 
 const { cleanDatabase, disconnectDatabase } = require('./setup')
+const { email } = require('zod')
 
 
 describe('POST /api/v1/auth/register', () => {
@@ -196,5 +197,68 @@ describe('POST /api/v1/auth/refresh', () => {
             .expect(401)
 
         expect(response.body).toHaveProperty('error')
+    })
+})
+
+describe('GET /api/v1/users/me (protected route)', () => {
+    beforeEach(async () => {
+        await cleanDatabase()
+    })
+
+    afterAll(async () => {
+        await disconnectDatabase()
+    })
+
+    it('rejects a request with no token', async () => {
+        const response = await request(app)
+            .get('/api/v1/users/me')
+            .expect(401)
+
+        expect(response.body).toHaveProperty('error')
+        expect(response.body.error).toMatch(/token|unauthorized|authentication/i)
+    })
+
+    it('rejects a request with a malformed token', async () => {
+        const response = await request(app)
+            .get('/api/v1/users/me')
+            .set('Authorization', 'Bearer this.is.not.avalid.jwt')
+            .expect(401)
+
+        expect(response.body).toHaveProperty('error')
+    })
+
+    it('allows access with a valid token and returns the correct user', async () => {
+        const userData = {
+            email: 'carlos@gmail.com',
+            name: 'carlos',
+            password: 'carlos123'
+        }
+
+        await request(app)
+            .post('/api/v1/auth/register')
+            .send(userData)
+            .expect(201)
+
+        const loginResponse = await request(app)
+            .post('/api/v1/auth/login')
+            .send({
+                email: userData.email,
+                password: userData.password
+            })
+            .expect(200)
+
+        const { accessToken } = loginResponse.body.data
+        expect(accessToken).toBeDefined()
+
+        const response = await request(app)
+            .get('/api/v1/users/me')
+            .set('Authorization', `Bearer ${accessToken}`)
+            .expect(200)
+
+        expect(response.body).toHaveProperty('success', true)
+        expect(response.body.data).toHaveProperty('email', userData.email)
+        expect(response.body.data.password).toBeUndefined()
+        expect(response.body.data.passwordHash).toBeUndefined()
+
     })
 })
