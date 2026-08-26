@@ -40,14 +40,14 @@ async function createApprovedVendorWithStore(email = 'george@gmail.com') {
 
     const storeResponse = await request(app)
         .post('/api/v1/stores')
-        .set('Authorization', `Bearer: ${accessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(
             {
                 name: `${email}'s Store`
             }
         )
 
-    return { accessToken, userId: user.id, storeId: storeResponse.body.data }
+    return { accessToken, userId: user.id, storeId: storeResponse.body.data.id }
 }
 
 async function createAdminAndCategory(categoryName = 'Test Category') {
@@ -95,15 +95,15 @@ async function createAdminAndCategory(categoryName = 'Test Category') {
     const adminAccessToken = reloginResponse.body.data.accessToken
 
     const categoryResponse = await request(app)
-        .post('/api/v1/stores')
-        .set('Authorization', `Bearer: ${adminAccessToken}`)
+        .post('/api/v1/categories')
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .send(
             {
                 name: 'categoryName'
             }
         )
 
-    return { adminAccessToken, categoryId: categoryResponse.body.data }
+    return { adminAccessToken, categoryId: categoryResponse.body.data.id }
 }
 
 module.exports = {
