@@ -4,6 +4,7 @@ const app = require('../src/app')
 
 const { prisma } = require('../src/config/database')
 const { VendorStatus } = require('@prisma/client')
+const expectCookies = require('supertest/lib/cookies')
 
 async function createApprovedVendorWithStore(email = 'george@gmail.com') {
     await request(app)
@@ -106,7 +107,56 @@ async function createAdminAndCategory(categoryName = 'Test Category') {
     return { adminAccessToken, categoryId: categoryResponse.body.data.id }
 }
 
+async function createAdmin() {
+    await request(app)
+        .post('/api/v1/auth/register')
+        .send(
+            {
+                email: 'testAdmin@gmail.com',
+                name: 'testAdmin',
+                password: 'test1234'
+            }
+        )
+
+    const loginResponse = await request(app)
+        .post('/api/v1/auth/login')
+        .send(
+            {
+                email: 'testAdmin@gmail.com',
+                password: 'test1234'
+            }
+        )
+
+    const { accessToken, user } = loginResponse.body.data
+
+    await prisma.user.update(
+        {
+            where: {
+                id: user.id,
+            },
+            data: {
+                isAdmin: true
+            }
+        }
+    )
+
+    const reloginResponse = await request(app)
+        .post('/api/v1/auth/login')
+        .send(
+            {
+                email: 'testAdmin@gmail.com',
+                password: 'test1234'
+            }
+        )
+
+    const adminAccessToken = reloginResponse.body.data.accessToken
+
+    return { adminAccessToken }
+
+}
+
 module.exports = {
     createApprovedVendorWithStore,
-    createAdminAndCategory
+    createAdminAndCategory,
+    createAdmin
 }
