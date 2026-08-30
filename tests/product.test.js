@@ -362,6 +362,62 @@ describe('Product endpoints', () => {
                 stock: 20,
             })
         })
+
+        it('rejects adding an inactive product to the cart', async () => {
+            const { accessToken: vendorToken } = await createApprovedVendorWithStore('vendor-inactive@example.com')
+            const { categoryId } = await createAdminAndCategory()
+
+            const createResponse = await request(app)
+                .post('/api/v1/products')
+                .set('Authorization', `Bearer ${vendorToken}`)
+                .send(
+                    {
+                        name: 'Inactive Product',
+                        description: 'Should not be addable to cart',
+                        price: 39.99,
+                        stock: 5,
+                        sku: 'INACTIVE-001',
+                        categoryId
+                    }
+                )
+                .expect(201)
+
+            const productId = createResponse.body.data.id
+
+            const deactivateResponse = await request(app)
+                .patch(`/api/v1/products/${productId}`)
+                .set('Authorization', `Bearer ${vendorToken}`)
+                .send({ isActive: false })
+                .expect(200)
+
+            expect(deactivateResponse.body.data.isActive).toBe(false)
+
+            await request(app)
+                .post('/api/v1/auth/register')
+                .send({
+                    email: 'inactive-cart-customer@example.com',
+                    name: 'Inactive Cart Customer',
+                    password: 'password123'
+                })
+                .expect(201)
+
+            const loginResponse = await request(app)
+                .post('/api/v1/auth/login')
+                .send({
+                    email: 'inactive-cart-customer@example.com',
+                    password: 'password123'
+                })
+                .expect(200)
+
+            const response = await request(app)
+                .post('/api/v1/cart/items')
+                .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+                .send({ productId, quantity: 1 })
+                .expect(400)
+
+            expect(response.body).toHaveProperty('error')
+            expect(response.body.error).toMatch(/active/i)
+        });
     })
 
     describe('DELETE /api/v1/products/:id', () => {

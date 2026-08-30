@@ -13,7 +13,7 @@ const createNewStore = async ({ userId, name, description, phone, address }) => 
     const existingStore = await findStoreByOwnerId(userId)
 
     if (existingStore) {
-        throw new Conflict('You already own a store')
+        throw new ConflictError('You already own a store')
     }
 
     return createStore(

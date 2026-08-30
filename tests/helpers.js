@@ -4,7 +4,6 @@ const app = require('../src/app')
 
 const { prisma } = require('../src/config/database')
 const { VendorStatus } = require('@prisma/client')
-const expectCookies = require('supertest/lib/cookies')
 
 async function createApprovedVendorWithStore(email = 'george@gmail.com') {
     await request(app)
@@ -49,6 +48,22 @@ async function createApprovedVendorWithStore(email = 'george@gmail.com') {
         )
 
     return { accessToken, userId: user.id, storeId: storeResponse.body.data.id }
+}
+
+async function registerVendorWithoutApproval(email, password = 'password123', name = 'Store User') {
+    await request(app)
+        .post('/api/v1/auth/register')
+        .send({ email, name, password })
+        .expect(201)
+
+    const loginResponse = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email, password })
+        .expect(200)
+
+    const { accessToken, user } = loginResponse.body.data
+
+    return { accessToken, userId: user.id }
 }
 
 async function createAdminAndCategory(categoryName = 'Test Category') {
@@ -100,7 +115,7 @@ async function createAdminAndCategory(categoryName = 'Test Category') {
         .set('Authorization', `Bearer ${adminAccessToken}`)
         .send(
             {
-                name: 'categoryName'
+                name: categoryName
             }
         )
 
@@ -152,11 +167,11 @@ async function createAdmin() {
     const adminAccessToken = reloginResponse.body.data.accessToken
 
     return { adminAccessToken }
-
 }
 
 module.exports = {
     createApprovedVendorWithStore,
+    registerVendorWithoutApproval,
     createAdminAndCategory,
     createAdmin
 }

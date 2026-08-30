@@ -4,3 +4,9 @@ node_modules/
 jest-output.json
 product-jest.json
 cart-jest.json
+store-jest.json
+cart-product-jest.json
+order-jest.json
+category-jest.json
+review-jest.json
+adminStats-jest.json

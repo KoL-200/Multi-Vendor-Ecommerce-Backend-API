@@ -20,7 +20,7 @@ router.use('/users', userRoutes);
 router.use('/stores', storeRoutes)
 router.use('/categories', categoryRoutes)
 router.use('/products', productRoutes)
-router.use('/carts', cartRoutes)
+router.use('/cart', cartRoutes)
 router.use('/orders', orderRoutes)
 router.use('/reviews', reviewRoutes)
 router.use('/admins', adminRoutes)
