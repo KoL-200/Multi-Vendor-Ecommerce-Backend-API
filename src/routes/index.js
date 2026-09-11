@@ -23,7 +23,7 @@ router.use('/products', productRoutes)
 router.use('/cart', cartRoutes)
 router.use('/orders', orderRoutes)
 router.use('/reviews', reviewRoutes)
-router.use('/admins', adminRoutes)
+router.use('/admin', adminRoutes)
 router.use('/vendor', vendorRoutes)
 
 module.exports = router;
