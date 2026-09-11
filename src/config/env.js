@@ -9,6 +9,7 @@ const envSchema = z.object({
     JWT_REFRESH_SECRET: z.string().min(1, 'JWT_REFRESH_SECRET is required'),
     JWT_ACCESS_EXPIRATION: z.string().default('15m'),
     JWT_REFRESH_EXPIRATION: z.string().default('7d'),
+    LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).optional(),
 })
 
 const parsed = envSchema.safeParse(process.env)
