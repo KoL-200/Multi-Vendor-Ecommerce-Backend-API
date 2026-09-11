@@ -9,12 +9,31 @@ const routes = require('./routes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
+
 const app = express();
 
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(pinoHttp({ logger }));
+app.use(pinoHttp(
+    {
+        logger,
+        redact: {
+            paths: [
+                'req.headers.authorization',
+                'req.body.password',
+                'req.body.refreshToken',
+                'req.body.accessToken',
+            ],
+            censor: '[REDACTED]',
+        },
+    }
+)
+);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/v1', routes);
 
