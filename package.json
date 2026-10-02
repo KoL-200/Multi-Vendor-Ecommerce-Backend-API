@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "dotenv -e .env.test -- jest --runInBand",
+    "test:coverage": "dotenv -e .env.test -- jest --coverage --runInBand",
     "test:db:push": "cross-env DATABASE_URL=\"postgresql://postgres:algo1502@localhost:5432/marketplace_test_db?schema=public\" prisma db push",
     "dev": "nodemon server.js",
     "start": "node server.js"
