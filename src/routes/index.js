@@ -24,6 +24,7 @@ router.use('/cart', cartRoutes)
 router.use('/orders', orderRoutes)
 router.use('/reviews', reviewRoutes)
 router.use('/admin', adminRoutes)
+router.use('/admins', adminRoutes)
 router.use('/vendor', vendorRoutes)
 
 module.exports = router;
